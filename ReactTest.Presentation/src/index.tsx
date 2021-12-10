@@ -2,16 +2,26 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
-import reportWebVitals from './reportWebVitals';
+import {createBrowserHistory} from "history";
+import configureStore from "./modules/ConfigureStore";
+import {Provider} from "react-redux";
+import {ConnectedRouter} from "connected-react-router";
+
+// connected-react-router 사용을 위한 History 생성
+// base 태그의 href (%PUBLIC_URL%)을 사용합니다.
+const baseUrl = document.getElementsByTagName("base")[0].getAttribute("href") as string;
+const history = createBrowserHistory();
+
+// 스토어를 생성합니다.
+const store = configureStore(history);
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
+    <React.StrictMode>
+        <Provider store={store}>
+            <ConnectedRouter history={history}>
+                <App/>
+            </ConnectedRouter>
+        </Provider>
+    </React.StrictMode>,
+    document.getElementById('root')
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
