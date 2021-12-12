@@ -30,19 +30,24 @@ export interface ICommonCode extends ILoggableItem {
     useYn: boolean;
 }
 
+export interface IGetCommonCodeResponse {
+    groupId: string;
+    codeList: ICommonCode[];
+}
+
 /**
  * GroupId에 해당하는 CommonCode를 조회합니다.
  * @param groupId CommonCode의 GroupId
  * @constructor
  */
 export async function GetCommonCodes(groupId: string): Promise<ICommonCode[]> {
-    const response = await Axios.get<ICommonCode[]>(apiPaths.GetCommonCodes, {
+    const response = await Axios.get<IGetCommonCodeResponse>(apiPaths.GetCommonCodes, {
         params: {
             groupId
         }
     });
     
-    return response.data;
+    return response.data?.codeList;
 }
 
 /**

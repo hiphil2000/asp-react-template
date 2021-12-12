@@ -1,13 +1,13 @@
-﻿import useAsync from "./UseAsync";
+﻿import useFetch from "./UseFetch";
 import {GetCommonCodes, ICommonCode} from "../apis/Core";
 import {useEffect} from "react";
 
 export default function useCommonCode(groupId: string) {
-    const [state, fetch] = useAsync<string, ICommonCode[]>(GetCommonCodes, groupId);
+    const [state, fetch] = useFetch<string, ICommonCode[]>(GetCommonCodes);
     
     useEffect(() => {
-        fetch();
-    }, [fetch]);
+        fetch(groupId);
+    }, [fetch, groupId]);
     
     return [state];
 }
