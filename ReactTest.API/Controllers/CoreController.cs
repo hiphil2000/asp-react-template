@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Web;
 using System.Web.Http;
 using ReactTest.API.Models;
 using ReactTest.API.Models.Responses;
@@ -52,6 +53,8 @@ namespace ReactTest.API.Controllers
 		[ActionName("GetCommonCodes")]
 		public GetCommonCodeResponse GetCommonCodes(string groupId)
 		{
+			var session = HttpContext.Current.Session;
+			
 			return new GetCommonCodeResponse()
 			{
 				GroupId = groupId,
