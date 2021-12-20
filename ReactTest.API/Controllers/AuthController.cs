@@ -1,20 +1,15 @@
-﻿using System.Web;
-using System.Web.Http;
+﻿using System.Web.Http;
+using ReactTest.API.Libraries;
 
 namespace ReactTest.API.Controllers
 {
 	public class AuthController : ApiController
 	{
 		[HttpGet]
-		public void CreateSession()
+		[ActionName("CreateSession")]
+		public string CreateSession()
 		{
-			var context = HttpContext.Current;
-			if (context.Session != null)
-			{
-				return;
-			}
-			
-			
+			return JwtHelper.CreateToken();
 		}
 	}
 }

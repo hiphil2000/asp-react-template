@@ -4,6 +4,7 @@ using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.SessionState;
 using Newtonsoft.Json.Serialization;
+using ReactTest.API.Filters;
 
 namespace ReactTest.API
 {
@@ -18,6 +19,8 @@ namespace ReactTest.API
 			// Session을 사용하도록 설정합니다.
 			HttpContext.Current.SetSessionStateBehavior(SessionStateBehavior.Required);
 
+			#region Configure Json Response
+
 			// Json Response를 사용하도록 합니다.
 			GlobalConfiguration.Configuration.Formatters.Clear();
 
@@ -29,6 +32,14 @@ namespace ReactTest.API
 				}
 			};
 			GlobalConfiguration.Configuration.Formatters.Add(jsonFormatter);
+			
+			#endregion
+
+			#region Configure JWT
+
+			GlobalConfiguration.Configuration.Filters.Add(new TokenAuthenticationAttribute());
+
+			#endregion
 		}
 	}
 }
