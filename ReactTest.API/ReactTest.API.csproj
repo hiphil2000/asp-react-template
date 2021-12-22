@@ -132,15 +132,20 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AuthController.cs" />
     <Compile Include="Controllers\CoreController.cs" />
-    <Compile Include="Filters\TokenAuthenticationAttribute.cs" />
+    <Compile Include="Filters\RoleBasedAuthenticationAttribute.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Libraries\JwtAlgorithm.cs" />
+    <Compile Include="Libraries\JwtClaims.cs" />
+    <Compile Include="Libraries\JwtExtensions.cs" />
     <Compile Include="Libraries\JwtHelper.cs" />
     <Compile Include="Models\Auth\JwtPayload.cs" />
+    <Compile Include="Models\Auth\LoginPayload.cs" />
     <Compile Include="Models\CommonCodeModel.cs" />
+    <Compile Include="Models\Responses\AuthenticationResult.cs" />
     <Compile Include="Models\Responses\GetCommonCodeResponse.cs" />
+    <Compile Include="Models\Role.cs" />
+    <Compile Include="Models\UserModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

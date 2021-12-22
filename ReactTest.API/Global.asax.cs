@@ -37,7 +37,7 @@ namespace ReactTest.API
 
 			#region Configure JWT
 
-			GlobalConfiguration.Configuration.Filters.Add(new TokenAuthenticationAttribute());
+			// GlobalConfiguration.Configuration.Filters.Add(new TokenAuthenticationAttribute());
 
 			#endregion
 		}

@@ -2,14 +2,17 @@
 using System.Linq;
 using System.Web;
 using System.Web.Http;
+using ReactTest.API.Filters;
 using ReactTest.API.Models;
 using ReactTest.API.Models.Responses;
+using ReactTest.API.Libraries;
 
 namespace ReactTest.API.Controllers
 {
+	[RoleBasedAuthentication(IsWhiteList = false, DenyList = new []{ Role.Anonymous })]
 	public class CoreController : ApiController
 	{
-		private static List<CommonCodeModel> Codes = new List<CommonCodeModel>()
+		private static readonly List<CommonCodeModel> Codes = new List<CommonCodeModel>()
 		{
 			new CommonCodeModel()
 			{
@@ -53,7 +56,7 @@ namespace ReactTest.API.Controllers
 		[ActionName("GetCommonCodes")]
 		public GetCommonCodeResponse GetCommonCodes(string groupId)
 		{
-			var session = HttpContext.Current.Session;
+			var payload = this.GetJwtPayload();
 			
 			return new GetCommonCodeResponse()
 			{
