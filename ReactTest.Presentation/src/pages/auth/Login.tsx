@@ -1,5 +1,7 @@
 ﻿import React from "react";
 import {IRoutedPage} from "../Interfaces";
+import PageTemplate from "../../components/layout/PageTemplate";
+import LoginForm from "../../containers/auth/LoginForm";
 
 /**
  * 로그인 페이지 입니다.
@@ -7,7 +9,9 @@ import {IRoutedPage} from "../Interfaces";
  */
 export default function Login() {
     return (
-        <h3>Login Page</h3>
+        <PageTemplate>
+            <LoginForm />
+        </PageTemplate>
     )
 }
 

@@ -1,4 +1,5 @@
 ﻿using System.Runtime.Serialization;
+using ReactTest.API.Models.Enums;
 
 namespace ReactTest.API.Models
 {

@@ -1,5 +1,6 @@
 ﻿import React from "react";
 import {IRoutedPage} from "../Interfaces";
+import PageTemplate from "../../components/layout/PageTemplate";
 
 /**
  * 테스트 페이지입니다.
@@ -7,9 +8,9 @@ import {IRoutedPage} from "../Interfaces";
  */
 export default function TestPage() {
     return (
-        <div>
+        <PageTemplate>
             <h3>TestPage</h3>
-        </div>
+        </PageTemplate>
     )
 }
 

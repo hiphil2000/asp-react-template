@@ -1,19 +1,28 @@
 ﻿import Axios from "axios";
 import apiPaths from "./Paths";
+import {IUser} from "./Interfaces";
 
 export interface ILoginPayload {
-    id: string,
+    userId: string,
     password: string
 }
 
 export interface ILoginResponse {
     success: boolean;
+    user?: IUser;
     token?: string;
     message?: string;
 }
 
-export async function Login(payload: ILoginPayload): Promise<ILoginResponse> {
-    const response = await Axios.post<ILoginResponse>(apiPaths.Login, payload);
+export default async function Login(payload: ILoginPayload): Promise<ILoginResponse> {
+    const response = await Axios.request<ILoginResponse>({
+        url: apiPaths.Login,
+        method: "POST",
+        data: {
+            ...payload
+        },
+        withCredentials: true
+    });
     
     return response.data;
 }

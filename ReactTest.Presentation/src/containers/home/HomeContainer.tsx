@@ -31,9 +31,6 @@ export default function HomeContainer({
                 }
                 {g001.data !== null && render(g001.data)}
             </select>
-            {/*<CommonCodeSelect {...g1_code}/>*/}
-            {/*<CommonCodeSelect {...g2_code}/>*/}
-            {/*<CommonCodeSelect {...g1_code2}/>*/}
         </div>
     )
 }

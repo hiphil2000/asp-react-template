@@ -41,9 +41,13 @@ export interface IGetCommonCodeResponse {
  * @constructor
  */
 export async function GetCommonCodes(groupId: string): Promise<ICommonCode[]> {
-    const response = await Axios.get<IGetCommonCodeResponse>(apiPaths.GetCommonCodes, {
+    const response = await Axios.request<IGetCommonCodeResponse>({
+        url: apiPaths.GetCommonCodes,
         params: {
             groupId
+        },
+        headers: {
+            Authorization: ""
         }
     });
     

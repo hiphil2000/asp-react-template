@@ -15,7 +15,14 @@ namespace ReactTest.API.Libraries
 		/// <returns></returns>
 		public static JwtPayload GetJwtPayload(this ApiController controller)
 		{
-			return JwtHelper.DecodeToken(controller.Request.Headers.Authorization.ToString());
+			if (controller.Request.Headers.Authorization != null)
+			{
+				return JwtHelper.DecodeToken(controller.Request.Headers.Authorization.ToString());
+			}
+			else
+			{
+				return null;
+			}
 		}
 	}
 }

@@ -1,6 +1,7 @@
 ﻿import React from "react";
 import {IRoutedPage} from "../Interfaces";
 import HomeContainer from "../../containers/home/HomeContainer";
+import PageTemplate from "../../components/layout/PageTemplate";
 
 /**
  * 홈 페이지입니다.
@@ -8,7 +9,9 @@ import HomeContainer from "../../containers/home/HomeContainer";
  */
 export default function Home() {
     return (
-        <HomeContainer />
+        <PageTemplate>
+            <HomeContainer />
+        </PageTemplate>
     )
 }
 
