@@ -86,6 +86,19 @@ namespace ReactTest.API.Controllers
 		}
 
 		/// <summary>
+		/// 현재 사용자 정보를 조회합니다.
+		/// 토큰이 올바르지 않거나, 정보가 없다면 null이 반환됩니다.
+		/// </summary>
+		/// <returns></returns>
+		[HttpGet]
+		[ActionName("CurrentUser")]
+		public UserModel GetCurrentUser()
+		{
+			var payload = this.GetJwtPayload();
+			return UserList.FirstOrDefault(u => u.UserNo == payload.Issuer);
+		}
+
+		/// <summary>
 		/// 로그인을 처리합니다.
 		/// 로그인 정보가 없다면 null을 반환합니다.
 		/// (임시 로직)

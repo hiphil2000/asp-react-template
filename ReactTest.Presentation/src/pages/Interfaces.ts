@@ -1,4 +1,7 @@
-﻿export interface IPage {
+﻿import * as React from "react";
+import {RouteComponentProps} from "react-router";
+
+export interface IPage {
     pageId: string;
     parentId?: string;
     pageName: string;
@@ -10,9 +13,9 @@
 }
 
 export interface IRouteData {
-    path?: string;
+    path: string;
+    component: React.ComponentType<RouteComponentProps<any>> | React.ComponentType<any> | undefined;
     exact?: boolean;
-    component?: any;
 }
 
 export interface IRoutedPage extends IPage, IRouteData {

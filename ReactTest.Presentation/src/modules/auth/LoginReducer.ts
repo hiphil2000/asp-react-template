@@ -1,5 +1,5 @@
 ﻿import {ActionType, createAsyncAction, createReducer} from "typesafe-actions";
-import Login, {ILoginPayload, ILoginResponse} from "../../libs/apis/Auth";
+import {Login, ILoginPayload, ILoginResponse} from "../../libs/apis/Auth";
 import {AxiosError} from "axios";
 import {asyncActionToArray, AsyncState, asyncStateHelper, createAsyncReducer} from "../ReducerUtils";
 import {call, put, takeLatest} from "redux-saga/effects";
