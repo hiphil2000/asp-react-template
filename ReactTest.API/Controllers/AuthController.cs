@@ -6,7 +6,9 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Web.Http;
 using IMSWeb.Controllers.Database;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using ReactTest.API.Filters;
 using ReactTest.API.Libraries;
 using ReactTest.API.Models;
 using ReactTest.API.Models.Auth;
@@ -92,10 +94,19 @@ namespace ReactTest.API.Controllers
 		/// <returns></returns>
 		[HttpGet]
 		[ActionName("CurrentUser")]
+		[RoleBasedAuthentication]
 		public UserModel GetCurrentUser()
 		{
 			var payload = this.GetJwtPayload();
 			return UserList.FirstOrDefault(u => u.UserNo == payload.Issuer);
+		}
+
+		[HttpPost]
+		[ActionName("ValidateToken")]
+		[RoleBasedAuthentication]
+		public JwtPayload ValidateToken()
+		{
+			return this.GetJwtPayload();
 		}
 
 		/// <summary>

@@ -5,7 +5,7 @@ import {ThemeProvider} from "@mui/material";
 import theme from "./libs/mui/Theme";
 
 function App() {
-    
+     
     
     return (
         <ThemeProvider theme={theme}>

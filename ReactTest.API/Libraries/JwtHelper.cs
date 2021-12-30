@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Web.Configuration;
@@ -10,6 +12,7 @@ using JWT.Algorithms;
 using JWT.Builder;
 using JWT.Exceptions;
 using JWT.Serializers;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
@@ -135,9 +138,73 @@ namespace ReactTest.API.Libraries
 
 		}
 
+		/// <summary>
+		/// 토큰이 유효한지 확인합니다.
+		/// </summary>
+		/// <param name="token">토큰</param>
+		/// <returns></returns>
+		public static bool IsValidToken(string token)
+		{
+			if (token.IsNullOrEmpty())
+			{
+				return false;
+			}
+			
+			var decoded = DecodeToken(token);
+
+			// 토큰이 존재하고, 사용중인 토큰인 경우, 유효한 토큰으로 처리합니다.
+			return decoded != null && IsUsingToken(decoded.JwtId.ToString());
+		}
+
+		/// <summary>
+		/// 토큰을 재발행합니다.
+		/// </summary>
+		/// <param name="accessToken"></param>
+		/// <param name="refreshToken"></param>
+		/// <param name="response"></param>
+		public static void ReissueToken(string accessToken, string refreshToken, HttpResponseMessage response)
+		{
+			// 1. Access Token이 유효한 경우: 권한 있음, RefreshToken 재발급
+			if (accessToken != null && IsValidToken(accessToken))
+			{
+				var accessPayload = DecodeToken(accessToken);
+				
+				// Refresh Token이 유효하지 않으면 재발급합니다.
+				if (!(refreshToken != null && IsValidToken(refreshToken)))
+				{
+					var newRefreshToken = CreateRefreshToken(accessPayload.Issuer);
+					if (response == null)
+					{
+						response = new HttpResponseMessage();
+					}
+					response.Headers.AddCookies(new []
+					{
+						CreateTokenCookie(Constants.RefreshToken,newRefreshToken)
+					});
+					
+				}
+			}
+			// 2. Access Token이 유효하지 않으나, Refresh Token 유효한 경우: 권한 있음, Access Token 재발급
+			else if (refreshToken != null && IsValidToken(refreshToken))
+			{
+				var refreshPayload = DecodeToken(refreshToken);
+				
+				// AccessToken을 재발급합니다.
+				var newAccessToken = CreateAccessToken(refreshPayload.Issuer);
+				if (response == null)
+				{
+					response = new HttpResponseMessage();
+				}
+				response.Headers.AddCookies(new []
+				{
+					CreateTokenCookie(Constants.AccessToken, newAccessToken)
+				});
+			}
+		}
+
 		#endregion
 
-		#region 토큰 쿠키 생성
+		#region 쿠키 관련 메서드
 
 		/// <summary>
 		/// 토큰의 쿠키 값를 생성합니다.
@@ -158,6 +225,12 @@ namespace ReactTest.API.Libraries
 			};
 		}
 
+		/// <summary>
+		/// 토큰 쿠키들을 생성합니다.
+		/// </summary>
+		/// <param name="accessToken">AccessToken</param>
+		/// <param name="refreshToken">RefreshToken</param>
+		/// <returns></returns>
 		public static CookieHeaderValue[] CreateTokenCookies(string accessToken, string refreshToken)
 		{
 			return new[]
@@ -165,6 +238,18 @@ namespace ReactTest.API.Libraries
 				CreateTokenCookie(Constants.AccessToken, accessToken),
 				CreateTokenCookie(Constants.RefreshToken, refreshToken)
 			};
+		}
+
+		/// <summary>
+		/// 요청에서 토큰 값을 추출합니다.
+		/// </summary>
+		/// <param name="type">토큰 타입(JwtHelper.Constants)</param>
+		/// <param name="request">HTTP 요청 메시지</param>
+		/// <returns></returns>
+		public static string GetTokenCookie(string type, HttpRequestMessage request)
+		{
+			var cookie = request.Headers.GetCookies(type)?.FirstOrDefault();
+			return cookie?[type]?.Value;
 		}
 
 		#endregion

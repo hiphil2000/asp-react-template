@@ -1,62 +1,6 @@
 ﻿import {useCallback, useReducer, useState, ReducerAction, Reducer} from "react";
 import {AxiosError} from "axios";
 
-// interface IAsyncState<TData> {
-//     loading: boolean;
-//     data: TData | null;
-//     error: AxiosError | null;
-// }
-//
-//
-//
-//
-// function reducer<TData>(state: IAsyncState<TData>, action: IAction<TData>): IAsyncState<TData> {
-//     switch(action.type) {
-//         case LOADING:
-//             return {
-//                 ...state,
-//                 loading: true
-//             }
-//         case SUCCESS:
-//             return {
-//                 ...state,
-//                 loading: false,
-//                 data: action.payload as TData
-//             }
-//         case ERROR:
-//             return {
-//                 ...state,
-//                 loading: false,
-//                 error: action.payload as AxiosError
-//             }
-//         default:
-//             return state;
-//     }
-// }
-//
-//
-// export default function useAsync<TPayload, TResult>(
-//     action: (param: TPayload) => Promise<TResult>, 
-//     payload: TPayload
-// ) {
-//     const [state, dispatch] = useReducer<typeof reducer, IAction<TResult>, >(reducer, initializeState);
-//    
-//     const fetchData = useCallback(async () => {
-//         dispatch({type: LOADING});
-//         try {
-//             const response = await action(payload);
-//             dispatch({type: SUCCESS, payload: response});
-//         } catch (e) {
-//             dispatch({type: ERROR, payload: e as AxiosError});
-//         }
-//     }, [payload]);
-//    
-//     return [
-//         state,
-//         fetchData
-//     ]
-// }
-
 export interface IAsyncState<TResult> {
     loading: boolean;
     data: TResult | null;

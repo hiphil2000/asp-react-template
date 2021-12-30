@@ -1,9 +1,11 @@
-﻿import React from "react";
+﻿import React, {useEffect} from "react";
 import {Redirect, Route, RouteComponentProps} from "react-router";
+import useAuth from "./hooks/UseAuth";
+import {Typography} from "@mui/material";
+import {LoginInfo} from "../pages/auth";
 
 interface IAuthRouteProps {
-    authenticated?: boolean;
-    redirectTo?: string;
+    roles: string[];
     path: string;
     component: React.ComponentType<RouteComponentProps<any>> | React.ComponentType<any> | undefined;
     exact?: boolean;
@@ -21,15 +23,32 @@ interface IAuthRouteProps {
  * @constructor
  */
 export default function AuthRoute({
-    authenticated,
-    redirectTo,
+    roles,
     path,
     component,
     exact
 }: IAuthRouteProps) {
-    return (
-        authenticated ?
-            <Route path={path} component={component} exact={exact} /> :
-            <Redirect to={redirectTo} />
-    )
+    const {state, validateToken} = useAuth();
+    
+    useEffect(() => {
+        validateToken();
+    }, []);
+    
+    const render = () => {
+        if (state.loading || state.data == null) {
+            return (<Typography>Loading...</Typography>)
+        } else {
+            if (roles.find(r => r === state.data?.role)) {
+                return (
+                    <Route path={path} component={component} exact={exact} />
+                )
+            } else {
+                return (
+                    <Redirect to={LoginInfo.path} />
+                )
+            }
+        }
+    }
+    
+    return render();
 }

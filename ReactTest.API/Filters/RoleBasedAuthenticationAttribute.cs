@@ -68,6 +68,10 @@ namespace ReactTest.API.Filters
 			base.OnActionExecuting(actionContext);
 		}
 
+		/// <summary>
+		/// 요청이 완료된 후, 토큰 재발급 절차를 밟습니다.
+		/// </summary>
+		/// <param name="actionExecutedContext"></param>
 		public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
 		{
 			var actionContext = actionExecutedContext.ActionContext;
@@ -80,47 +84,13 @@ namespace ReactTest.API.Filters
 			
 			// 요청 컨텍스트
 			var request = actionContext.Request;
-			var accessTokenCookie = request.Headers.GetCookies(JwtHelper.Constants.AccessToken)?.FirstOrDefault();
-			var refreshTokenCookie = request.Headers.GetCookies(JwtHelper.Constants.RefreshToken)?.FirstOrDefault();
 
-			var accessToken = accessTokenCookie?[JwtHelper.Constants.AccessToken].Value;
-			var refreshToken = refreshTokenCookie?[JwtHelper.Constants.RefreshToken].Value;
-			
-			// 1. Access Token이 유효한 경우: 권한 있음, RefreshToken 재발급
-			if (accessToken != null && IsValidToken(accessToken))
-			{
-				var accessPayload = JwtHelper.DecodeToken(accessToken);
-				
-				// Refresh Token이 유효하지 않으면 재발급합니다.
-				if (!(refreshToken != null && IsValidToken(refreshToken)))
-				{
-					var newRefreshToken = JwtHelper.CreateRefreshToken(accessPayload.Issuer);
-					if (actionContext.Response == null)
-					{
-						actionContext.Response = new HttpResponseMessage();
-					}
-					actionContext.Response.Headers.AddCookies(new []
-					{
-						JwtHelper.CreateTokenCookie(JwtHelper.Constants.RefreshToken,newRefreshToken)
-					});
-				}
-			}
-			// 2. Access Token이 유효하지 않으나, Refresh Token 유효한 경우: 권한 있음, Access Token 재발급
-			else if (refreshToken != null && IsValidToken(refreshToken))
-			{
-				var refreshPayload = JwtHelper.DecodeToken(refreshToken);
-				
-				// AccessToken을 재발급합니다.
-				var newAccessToken = JwtHelper.CreateAccessToken(refreshPayload.Issuer);
-				if (actionContext.Response == null)
-				{
-					actionContext.Response = new HttpResponseMessage();
-				}
-				actionContext.Response.Headers.AddCookies(new []
-				{
-					JwtHelper.CreateTokenCookie(JwtHelper.Constants.AccessToken, newAccessToken)
-				});
-			}
+			// 토큰의 유효 여부를 확인하고, 재발급을 진행합니다.
+			var accessToken = JwtHelper.GetTokenCookie(JwtHelper.Constants.AccessToken, request);
+			var refreshToken = JwtHelper.GetTokenCookie(JwtHelper.Constants.RefreshToken, request);
+
+			// 토큰 재발급
+			JwtHelper.ReissueToken(accessToken, refreshToken, actionContext.Response);
 			
 			base.OnActionExecuted(actionExecutedContext);
 		}

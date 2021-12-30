@@ -16,3 +16,12 @@ export interface IUser {
     userName: string;
     role: string;
 }
+
+export interface IJwtPayload {
+    issuer: number,
+    expirationTime: string,
+    issuedAt: string,
+    jwtId: string,
+    subject: string,
+    role: string
+}

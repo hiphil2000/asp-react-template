@@ -123,8 +123,6 @@ namespace ReactTest.API.Controllers
 		[ActionName("GetCommonCodes")]
 		public GetCommonCodeResponse GetCommonCodes(string groupId)
 		{
-			var payload = this.GetJwtPayload();
-
 			return new GetCommonCodeResponse()
 			{
 				GroupId = groupId,

@@ -43,7 +43,7 @@ export default function NavBar({
                                         sx={{
                                             color: "white",
                                             mr: "0.25em",
-                                            "&:nth-last-child(1)": {
+                                            "&:nth-last-of-type(1)": {
                                                 mr: 0
                                             }
                                         }}

@@ -6,11 +6,13 @@ interface IHomeContainerProps {
     
 }
 
+const loading = "%%LOADING%%";
+
 export default function HomeContainer({
     
 }: IHomeContainerProps) {
-    const [g001] = useCommonCode("G001");
-    const [g002] = useCommonCode("G002");
+    const g001 = useCommonCode("G001");
+    const g002 = useCommonCode("G002");
     
     const render = (datas: ICommonCode[]) => {
         return (
@@ -23,13 +25,15 @@ export default function HomeContainer({
     return (
         <div>
             <h3>Home</h3>
-            <select>
+            <select value={g001.resultList.loading ? loading : g001.value} 
+                    onChange={g001.onChange}
+            >
                 {
-                    g001.loading 
-                        ? <option disabled selected>Loading...</option> 
+                    g001.resultList.loading 
+                        ? <option disabled id="%%LOADING%%">Loading...</option> 
                         : ""
                 }
-                {g001.data !== null && render(g001.data)}
+                {g001.resultList.data !== null && render(g001.resultList.data)}
             </select>
         </div>
     )

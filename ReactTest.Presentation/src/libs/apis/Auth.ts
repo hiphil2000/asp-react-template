@@ -1,6 +1,6 @@
 ﻿import Axios from "axios";
 import apiPaths from "./Paths";
-import {IUser} from "./Interfaces";
+import {IJwtPayload, IUser} from "./Interfaces";
 
 /**
  * 로그인 요청의 페이로드 타입입니다.
@@ -53,6 +53,16 @@ export interface IGetCurrentUserResponse {
  */
 export async function GetCurrentUser(): Promise<IGetCurrentUserResponse> {
     const response = await Axios.get<IGetCurrentUserResponse>(apiPaths.GetCurrentUser);
+    
+    return response.data;
+}
+
+/**
+ * 현재 설정된 쿠키가 유효한지 확인합니다.
+ * @constructor
+ */
+export async function ValidateToken(): Promise<IJwtPayload> {
+    const response = await Axios.post<IJwtPayload>(apiPaths.ValidateToken);
     
     return response.data;
 }
