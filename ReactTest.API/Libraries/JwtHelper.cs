@@ -121,6 +121,12 @@ namespace ReactTest.API.Libraries
 		/// <returns></returns>
 		public static JwtPayload DecodeToken(string token)
 		{
+			// 입력이 null이면 null로 반환합니다.
+			if (token.IsNullOrEmpty())
+			{
+				return null;
+			}
+			
 			try
 			{
 				var payload = JwtBuilder.Create()

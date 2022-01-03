@@ -3,8 +3,17 @@ import {Route, Switch} from "react-router";
 import {Home, HomeInfo, IRoutedPage, PageList, TestPage, TestPageInfo} from "../pages";
 import AuthRoute from "./AuthRoute";
 import {Login, LoginInfo} from "../pages/auth";
+import {IUser} from "./apis/Interfaces";
 
-export default function PageRoute() {
+interface IPageRouteProps {
+    currentUser: IUser | null,
+    userLoading: boolean
+}
+
+export default function PageRoute({
+    currentUser,
+    userLoading
+}: IPageRouteProps) {
     // 모든 라우트 정보를 조회합니다.
     const routes = useMemo<IRoutedPage[]>(() => {
         return PageList;
@@ -12,11 +21,15 @@ export default function PageRoute() {
 
     return (
         <Switch>
+            <Route path="/" exact component={Home} />
             <Route path={HomeInfo.path} exact component={Home} />
             <Route path={LoginInfo.path} component={Login} />
-            <AuthRoute path={TestPageInfo.path} component={TestPage} roles={["Admin", "Member"]} />
-            <Route path="/" exact component={Home} />
-            
+            <AuthRoute currentUser={currentUser} roles={["Admin", "Member"]}
+                       userLoading={userLoading}
+                       path={TestPageInfo.path} component={TestPage}
+            />
+
+
             {/*{*/}
             {/*    // 모든 라우트 정보를 Route로 만듭니다.*/}
             {/*    routes.map(route => <Route key={route.pageId} {...route} />)*/}

@@ -5,6 +5,7 @@ import pageList from "../../pages/PageList";
 import {useHistory} from "react-router";
 import useAuth from "../../libs/hooks/UseAuth";
 import {LoginInfo} from "../../pages/auth";
+import NavUser from "./NavUser";
 
 interface INavBarProps {
 }
@@ -53,7 +54,7 @@ export default function NavBar({
                             )
                         })}
                     </Box>
-                    {auth.loggedIn && <Typography>{auth.currentUser?.userName}</Typography>}
+                    <NavUser user={auth.currentUser} onLogout={auth.logout} />
                 </Toolbar>
             </Container>
         </AppBar>

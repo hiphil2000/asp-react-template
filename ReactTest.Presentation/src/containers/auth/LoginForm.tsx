@@ -1,9 +1,10 @@
 ﻿import React, {useEffect, useState} from "react";
 import {Button, styled, TextField, Typography} from "@mui/material";
 import {useDispatch, useSelector} from "react-redux";
-import {loginAsync, loginSelector} from "../../modules/auth/LoginReducer";
 import {ILoginPayload} from "../../libs/apis/Auth";
 import {useHistory} from "react-router";
+import {loginSelector} from "../../modules/auth/Seletors";
+import {requestLoginAsync} from "../../modules/auth";
 
 export interface ILoginFormProps {
     
@@ -22,7 +23,7 @@ export default function LoginForm({
     });
     
     const handleLogin = () => {
-        dispatch(loginAsync.request(formState));
+        dispatch(requestLoginAsync.request(formState));
     }
     
     const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
@@ -40,6 +41,8 @@ export default function LoginForm({
     }
     
     useEffect(() => {
+        console.log(login);
+        
         if (login.loading === false && login.data?.success === true) {
             history.push("/");
         }

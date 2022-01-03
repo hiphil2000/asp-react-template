@@ -59,30 +59,29 @@ export function createAsyncReducer<S, AC extends AnyAsyncActionCreator, K extend
     asyncActionCreator: AC,
     key: K
 ) {
-    // 리듀서를 생성하여 반환합니다.
-    return (state: S, action: AnyAction) => {
-        // 각 Action Creator의 Type을 추출합니다.
-        const [request, success, failure] = asyncActionToArray(asyncActionCreator).map(getType);
-
-        // Action 타입에 따라 헬퍼를 사용합니다.
-        switch (action.type) {
-            case request:
-                return {
-                    ...state,
-                    [key]: asyncStateHelper.load()
-                };
-            case success:
-                return {
-                    ...state,
-                    [key]: asyncStateHelper.success(action.payload)
-                };
-            case failure:
-                return {
-                    ...state,
-                    [key]: asyncStateHelper.error(action.payload)
-                };
-            default:
-                return state;
-        }
+    const [request, success, failure] = asyncActionToArray(asyncActionCreator).map(getType);
+    
+    return {
+        [request]: (state: S, action: AnyAction) => ({
+            ...state,
+            [key]: {
+                ...state[key],
+                ...asyncStateHelper.load()
+            }
+        }),
+        [success]: (state: S, action: AnyAction) => ({
+            ...state,
+            [key]: {
+                ...state[key],
+                ...asyncStateHelper.success(action.payload)
+            }
+        }),
+        [failure]: (state: S, action: AnyAction) => ({
+            ...state,
+            [key]: {
+                ...state[key],
+                ...asyncStateHelper.error(action.payload)
+            }
+        })
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -87,6 +88,53 @@ namespace ReactTest.API.Controllers
 			return response;
 		}
 
+		[HttpPost]
+		[ActionName("Logout")]
+		public HttpResponseMessage Logout()
+		{
+			var response = new HttpResponseMessage();
+			
+			var accessToken = this.GetJwtToken(JwtHelper.Constants.AccessToken);
+			var refreshToken = this.GetJwtToken(JwtHelper.Constants.RefreshToken);
+
+			// 토큰이 아예 없는 경우: 무시
+			if (accessToken.IsNullOrEmpty() && refreshToken.IsNullOrEmpty())
+			{
+				return response;
+			}
+			
+			// DB에서 쿠키를 사용안함 처리합니다.
+			RemoveToken(accessToken);
+			RemoveToken(refreshToken);
+
+			// 만료된 쿠키를 추가하여 쿠키를 제거합니다.
+			var cookies = JwtHelper
+				.CreateTokenCookies(accessToken, refreshToken)
+				.Select(x =>
+				{
+					x.Expires = DateTimeOffset.Now.AddDays(-1);
+					return x;
+				});
+			response.Headers.AddCookies(cookies);
+
+			return response;
+		}
+
+		private void RemoveToken(string token)
+		{
+			var decoded = JwtHelper.DecodeToken(token);
+			if (decoded == null)
+			{
+				return;
+			}
+
+			using (var db = new SqlService())
+			{
+				db.AddParameter("@TokenId", DbType.Guid, decoded.JwtId);
+				_ = db.ExecuteQuery("uSP_RemoveToken", commandType: CommandType.StoredProcedure);
+			}
+		}
+
 		/// <summary>
 		/// 현재 사용자 정보를 조회합니다.
 		/// 토큰이 올바르지 않거나, 정보가 없다면 null이 반환됩니다.
@@ -94,7 +142,7 @@ namespace ReactTest.API.Controllers
 		/// <returns></returns>
 		[HttpGet]
 		[ActionName("CurrentUser")]
-		[RoleBasedAuthentication]
+		[TokenAuthentication]
 		public UserModel GetCurrentUser()
 		{
 			var payload = this.GetJwtPayload();

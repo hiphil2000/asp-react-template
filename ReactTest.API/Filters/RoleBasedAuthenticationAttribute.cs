@@ -20,7 +20,7 @@ namespace ReactTest.API.Filters
 	/// 역할 기반 접근 제어를 위한 Attribute입니다.
 	/// 기본 모드는 WhiteList입니다.
 	/// </summary>
-	public class RoleBasedAuthenticationAttribute : ActionFilterAttribute, IActionFilter
+	public class RoleBasedAuthenticationAttribute : TokenAuthenticationAttribute
 	{
 		/// <summary>
 		/// WhiteList 여부입니다.
@@ -44,24 +44,15 @@ namespace ReactTest.API.Filters
 		/// <param name="actionContext"></param>
 		public override void OnActionExecuting(HttpActionContext actionContext)
 		{
-			// 권한이 필요 없는 경우에는 진행하지 않습니다.
-			if (IsAllowAnonymous(actionContext))
-			{
-				return;
-			}
-			
-			// 요청 컨텍스트
-			var request = actionContext.Request;
-			var accessTokenCookie = request.Headers.GetCookies(JwtHelper.Constants.AccessToken)?.FirstOrDefault();
-			var refreshTokenCookie = request.Headers.GetCookies(JwtHelper.Constants.RefreshToken)?.FirstOrDefault();
+			base.OnActionExecuting(actionContext);
 
-			var accessToken = accessTokenCookie?[JwtHelper.Constants.AccessToken].Value;
-			var refreshToken = refreshTokenCookie?[JwtHelper.Constants.RefreshToken].Value;
-			
-			// 둘 다 유효하지 않은 경우: 권한 없음
-			if (!(IsValidToken(accessToken) || IsValidToken(refreshToken)))
+			var request = actionContext.Request;
+			var access = JwtHelper.GetTokenCookie(JwtHelper.Constants.AccessToken, request); 
+			var refresh = JwtHelper.GetTokenCookie(JwtHelper.Constants.RefreshToken, request);
+
+			// 권한이 올바르지 않은 경우: 권한 없음
+			if (!(IsValidRole(access) || IsValidRole(refresh)))
 			{
-				// 모두 유효하지 않으므로, 권한 없음 처리합니다.
 				HandleUnauthorized(actionContext);
 			}
 			
@@ -69,66 +60,20 @@ namespace ReactTest.API.Filters
 		}
 
 		/// <summary>
-		/// 요청이 완료된 후, 토큰 재발급 절차를 밟습니다.
+		/// 토큰의 권한이 현재 대상에 올바른지 확인합니다.
 		/// </summary>
-		/// <param name="actionExecutedContext"></param>
-		public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
-		{
-			var actionContext = actionExecutedContext.ActionContext;
-			
-			// 권한이 필요 없는 경우에는 진행하지 않습니다.
-			if (IsAllowAnonymous(actionContext))
-			{
-				return;
-			}
-			
-			// 요청 컨텍스트
-			var request = actionContext.Request;
-
-			// 토큰의 유효 여부를 확인하고, 재발급을 진행합니다.
-			var accessToken = JwtHelper.GetTokenCookie(JwtHelper.Constants.AccessToken, request);
-			var refreshToken = JwtHelper.GetTokenCookie(JwtHelper.Constants.RefreshToken, request);
-
-			// 토큰 재발급
-			JwtHelper.ReissueToken(accessToken, refreshToken, actionContext.Response);
-			
-			base.OnActionExecuted(actionExecutedContext);
-		}
-
-		/// <summary>
-		/// 요청에 대해 권한 없음 처리를 합니다.
-		/// </summary>
-		/// <param name="context">요청의 액션 컨텍스트</param>
-		private void HandleUnauthorized(HttpActionContext context)
-		{
-			 context.Response = new HttpResponseMessage(HttpStatusCode.Unauthorized);
-		}
-
-		/// <summary>
-		/// 대상 액션의 AllowAnonymous Attribute 적용 여부를 확인합니다.
-		/// </summary>
-		/// <param name="actionContext">요청의 액션 컨텍스트</param>
+		/// <param name="token"></param>
 		/// <returns></returns>
-		private static bool IsAllowAnonymous(HttpActionContext actionContext)
+		private bool IsValidRole(string token)
 		{
-			return actionContext.ActionDescriptor.GetCustomAttributes<AllowAnonymousAttribute>().Any() ||
-			       actionContext.ActionDescriptor.ControllerDescriptor.GetCustomAttributes<AllowAnonymousAttribute>()
-				       .Any();
-		}
-
-		private bool IsValidToken(string tokenString)
-		{
-			if (tokenString.IsNullOrEmpty())
+			if (token == null)
 			{
 				return false;
 			}
 			
-			var decoded = JwtHelper.DecodeToken(tokenString);
-			
-			return decoded != null ||
-			       JwtHelper.IsUsingToken(decoded.JwtId.ToString()) ||
-			       (IsWhiteList && PermitList.Contains(decoded.Role)) ||
-			       (!IsWhiteList && !DenyList.Contains(decoded.Role));
+			var decoded = JwtHelper.DecodeToken(token);
+
+			return IsWhiteList ? PermitList.Contains(decoded.Role) : !DenyList.Contains(decoded.Role);
 		}
 	}
 }

@@ -133,6 +133,7 @@
     <Compile Include="Controllers\AuthController.cs" />
     <Compile Include="Controllers\CoreController.cs" />
     <Compile Include="Filters\RoleBasedAuthenticationAttribute.cs" />
+    <Compile Include="Filters\TokenAuthenticationAttribute.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

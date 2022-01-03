@@ -39,20 +39,11 @@ export async function Login(payload: ILoginPayload): Promise<ILoginResponse> {
 }
 
 /**
- * 현재 사용자 조회 요청의 반환 타입입니다.
- */
-export interface IGetCurrentUserResponse {
-    success: boolean;
-    user?: IUser;
-    message?: string;
-}
-
-/**
  * 현재 사용자의 정보를 조회합니다.
  * @constructor
  */
-export async function GetCurrentUser(): Promise<IGetCurrentUserResponse> {
-    const response = await Axios.get<IGetCurrentUserResponse>(apiPaths.GetCurrentUser);
+export async function GetCurrentUser(): Promise<IUser> {
+    const response = await Axios.get<IUser>(apiPaths.GetCurrentUser);
     
     return response.data;
 }
@@ -65,4 +56,13 @@ export async function ValidateToken(): Promise<IJwtPayload> {
     const response = await Axios.post<IJwtPayload>(apiPaths.ValidateToken);
     
     return response.data;
+}
+
+/**
+ * 로그아웃을 처리합니다.
+ * @return {Promise<void>}
+ * @constructor
+ */
+export async function Logout(): Promise<void> {
+    await Axios.post(apiPaths.Logout);
 }
