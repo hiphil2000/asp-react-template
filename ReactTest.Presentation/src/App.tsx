@@ -1,26 +1,29 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {useEffect, useState} from 'react';
+import {BrowserRouter} from 'react-router-dom';
+import PageRoute from "./libs/PageRoute";
+import {ThemeProvider} from "@mui/material";
+import theme from "./libs/mui/Theme";
+import useAuth from "./libs/hooks/UseAuth";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const {currentUser} = useAuth();
+    // const authStore = useSelector((state: IRootState) => state.auth);
+    // const userStore = useSelector((state: IRootState) => state.auth.getCurrentUser);
+    //
+    // const [isLoading, setLoading]= useState<boolean>(true);
+    //
+    // useEffect(() => {
+    //     setLoading(authStore.user === null && userStore.data === null && userStore.error === null);
+    //     console.log(authStore.user === null && userStore.data === null && userStore.error === null);
+    // }, [authStore])
+    
+    return (
+        <ThemeProvider theme={theme}>
+            <BrowserRouter>
+                <PageRoute currentUser={currentUser} />
+            </BrowserRouter>
+        </ThemeProvider>
+    );
 }
 
 export default App;
