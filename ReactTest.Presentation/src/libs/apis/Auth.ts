@@ -15,7 +15,7 @@ export interface ILoginPayload {
  */
 export interface ILoginResponse {
     success: boolean;
-    user?: IUser;
+    user: IUser | null;
     token?: string;
     message?: string;
 }

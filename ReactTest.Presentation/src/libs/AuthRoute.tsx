@@ -7,7 +7,6 @@ import {IUser} from "./apis/Interfaces";
 
 interface IAuthRouteProps {
     currentUser: IUser | null;
-    userLoading: boolean;
     roles: string[];
     path: string;
     component: React.ComponentType<RouteComponentProps<any>> | React.ComponentType<any> | undefined;
@@ -28,24 +27,15 @@ interface IAuthRouteProps {
  */
 export default function AuthRoute({
     currentUser,
-    userLoading,
     roles,
     path,
     component,
     exact,
     redirectTo
 }: IAuthRouteProps) {
-    console.log(userLoading)
-    
     return (
-        userLoading ?
-            (
-                <Typography>Loading...</Typography>
-            ) :
-            (
-                currentUser && roles.includes(currentUser.role) ?
-                    <Route path={path} component={component} exact={exact} /> :
-                    <Redirect to={redirectTo || LoginInfo.path} /> 
-            )
+        currentUser && roles.includes(currentUser.role) ?
+            <Route path={path} component={component} exact={exact} /> :
+            <Redirect to={redirectTo || LoginInfo.path} />
     )
 }

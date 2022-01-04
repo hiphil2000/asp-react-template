@@ -1,5 +1,5 @@
 ﻿import {all} from "redux-saga/effects";
-import {authReducer, AuthState, currentUserSaga, requestLoginSaga} from "./auth";
+import {authReducer, AuthState, currentUserSaga} from "./auth";
 
 // 모든 리듀서의 목록입니다.
 export const reducers = {
@@ -13,7 +13,6 @@ export interface IRootState {
 
 export function* rootSaga() {
     yield all([
-        currentUserSaga(),
-        requestLoginSaga()
+        currentUserSaga()
     ]);
 }

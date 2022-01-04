@@ -35,7 +35,7 @@ export default function NavBar({
                         flexGrow: 1
                     }}>
                         {pageList.map(page => {
-                            if (auth.loggedIn && page.pageId === LoginInfo.pageId) {
+                            if (auth.currentUser !== null && page.pageId === LoginInfo.pageId) {
                                 return;
                             }
                             return (

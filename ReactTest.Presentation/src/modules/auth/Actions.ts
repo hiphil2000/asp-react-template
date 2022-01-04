@@ -27,10 +27,3 @@ export const getCurrentUserAsync = createAsyncAction(
     GET_CURRENT_USER_SUCCESS,
     GET_CURRENT_USER_FAILURE
 )<void, IUser, AxiosError>();
-
-// 로그인 액션 생성자입니다.
-export const requestLoginAsync = createAsyncAction(
-    REQUEST_LOGIN,
-    REQUEST_LOGIN_SUCCESS,
-    REQUEST_LOGIN_FAILURE
-)<ILoginPayload, ILoginResponse, AxiosError>();

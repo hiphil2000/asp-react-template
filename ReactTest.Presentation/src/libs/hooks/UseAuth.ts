@@ -1,80 +1,72 @@
 ﻿import {useDispatch, useSelector} from "react-redux";
 import useFetch from "./UseFetch";
-import {IJwtPayload} from "../apis/Interfaces";
-import {Logout, ValidateToken} from "../apis/Auth";
-import {useCallback, useEffect} from "react";
-import {UserStorage} from "../local-storage";
-import {IRootState} from "../../modules";
-import {getCurrentUserAsync, setUser} from "../../modules/auth";
+import {IUser} from "../apis/Interfaces";
+import {ILoginPayload, ILoginResponse, Login, Logout} from "../apis/Auth";
+import {useCallback, useEffect, useState} from "react";
+import {StorageHelper} from "../local-storage";
+import {setUser} from "../../modules/auth";
+import {userSelector} from "../../modules/auth/Seletors";
+import {USER_KEY} from "../local-storage/StorageHelper";
 
+/**
+ * 인증과 관련된 기능을 갖고 있는 Hook입니다.
+ * @return {{currentUser: IUser, logout: () => void, loginState: IAsyncState<ILoginResponse>, login: (payload: ILoginPayload) => void}}
+ */
 export default function useAuth() {
     const dispatch = useDispatch();
-    const authStore = useSelector((state: IRootState) => state.auth);
-    const userStorage = new UserStorage(); 
     
-    const [tokenState, validateToken] = useFetch<void, IJwtPayload>(ValidateToken);
+    // 사용할 스토어들
+    const userStore = useSelector(userSelector);
+    
+    // 요청 Utils
+    const storage = StorageHelper.getInstance();
     const [logoutState, logout] = useFetch<void, void>(Logout);
+    const [loginState, login] = useFetch<ILoginPayload, ILoginResponse>(Login);
+    
+    // Saga 요청 핸들링을 위한 State
+    const [isLoginRequest, setLoginRequest] = useState<boolean>(false);
+    
+    // 유저 설정 함수입니다.
+    const applyUser = (user: IUser | null): void => {
+        // 스토리지 설정
+        storage.set(USER_KEY, user);
+        
+        // 스토어 설정
+        dispatch(setUser(user));
+    }
+    
+    // 로그인 함수입니다.
+    const handleLogin = useCallback((payload: ILoginPayload) => {
+        // 이미 로그인 요청을 했다면, 무시합니다.
+        if (isLoginRequest) {
+            return;
+        }
+        
+        // 로그인 요청을 진행합니다.
+        setLoginRequest(true);
+        login(payload);
+    }, []);
+    
+    // 로그인 State 처리용 Effect입니다.
+    useEffect(() => {
+        if (loginState.loading === false && loginState.data !== null) {
+            if (isLoginRequest) {
+                setLoginRequest(false);
+                applyUser(loginState.data.user);
+            }
+        }
+    }, [isLoginRequest, loginState])
     
     // 로그아웃 함수입니다.
     const handleLogout = useCallback(() => {
-        const effect = async () => {
-            await logout();
-            
-            // 스토리지 삭제
-            userStorage.set(null);
-            
-            // 스토어 삭제
-            dispatch(setUser(null));
-        }
-        
-        effect();
+        logout();
+        applyUser(null);
     }, []);
-    
-    useEffect(() => {
-        if (authStore.user === null) {
-            // 최초 조회 시, 사용자 정보가 없다면 로컬스토리지와 서버를 조회합니다.
-            
-            if (userStorage.exists()) {
-                // TODO: LocalStorage 검증 방식 확정
-                // 로그인 정보가 LocalStorage에 있다면, 토큰을 검증합니다.
-                // validateToken();
-                
-                // LocalStorage에 있다면 그대로 사용합니다.
-                dispatch(setUser(userStorage.get()!));
-            } else {
-                // 아니면 서버에서 현재 사용자를 조회합니다.
-                dispatch(getCurrentUserAsync.request());
-            }
-        }
-    }, []);
-    
-    useEffect(() => {
-        // 서버에 사용자 정보가 있다면 사용자를 설정합니다.
-        if (authStore.getCurrentUser.data) {
-            const user = authStore.getCurrentUser.data; 
-            
-            dispatch(setUser(user));
-            userStorage.set(user)
-        }
-    }, [authStore.getCurrentUser])
-    
-    // TODO: LocalStorage 검증 방식 확정
-    // useEffect(() => {
-    //     // 로컬 스토리지의 정보가 유효하다면 그대로 사용합니다.
-    //     if (tokenState.loading === false && tokenState.data) {
-    //         const user = userStorage.get();
-    //        
-    //         if (user !== null && tokenState.data.issuer === user.userNo) {
-    //             dispatch(setUser(user))
-    //         }
-    //     }
-    // }, [tokenState])
     
     return {
-        loggedIn: authStore.user !== null,
-        currentUser: authStore.user,
-        tokenState,
-        validateToken,
+        currentUser: userStore,
+        login: handleLogin,
+        loginState: loginState,
         logout: handleLogout
     }
 }

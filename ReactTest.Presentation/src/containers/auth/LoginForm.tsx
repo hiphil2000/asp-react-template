@@ -1,10 +1,8 @@
 ﻿import React, {useEffect, useState} from "react";
 import {Button, styled, TextField, Typography} from "@mui/material";
-import {useDispatch, useSelector} from "react-redux";
 import {ILoginPayload} from "../../libs/apis/Auth";
 import {useHistory} from "react-router";
-import {loginSelector} from "../../modules/auth/Seletors";
-import {requestLoginAsync} from "../../modules/auth";
+import useAuth from "../../libs/hooks/UseAuth";
 
 export interface ILoginFormProps {
     
@@ -13,19 +11,16 @@ export interface ILoginFormProps {
 export default function LoginForm({
     
 }: ILoginFormProps) {
-    const dispatch = useDispatch();
     const history = useHistory();
-    const login = useSelector(loginSelector);
-        
+    const {currentUser, login, loginState} = useAuth();
+
+    // 폼 임력 State
     const [formState, setFormState] = useState<ILoginPayload>({
         userId: "",
         password: ""
     });
     
-    const handleLogin = () => {
-        dispatch(requestLoginAsync.request(formState));
-    }
-    
+    // 폼 입력 이벤트 핸들러
     const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
         const target = e.target as HTMLInputElement; 
         const id = target.id;
@@ -40,13 +35,17 @@ export default function LoginForm({
         }
     }
     
+    // 로그인 이벤트 핸들러
+    const handleLogin = () => {
+        login(formState);
+    }
+    
+    // CurrentUser가 있다면, 홈으로 보냅니다.
     useEffect(() => {
-        console.log(login);
-        
-        if (login.loading === false && login.data?.success === true) {
+        if (currentUser) {
             history.push("/");
         }
-    }, [login]);
+    }, [currentUser]);
     
     return (
         <FormContainer>
@@ -59,7 +58,7 @@ export default function LoginForm({
                        value={formState.password}
                        onInput={handleInput}
             />
-            <Button id="loginButton" onClick={handleLogin} disabled={login.loading}>Login</Button>
+            <Button id="loginButton" onClick={handleLogin} disabled={loginState.loading}>Login</Button>
         </FormContainer>
     )
 }

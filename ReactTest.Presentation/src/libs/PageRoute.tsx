@@ -6,18 +6,18 @@ import {Login, LoginInfo} from "../pages/auth";
 import {IUser} from "./apis/Interfaces";
 
 interface IPageRouteProps {
-    currentUser: IUser | null,
-    userLoading: boolean
+    currentUser: IUser | null
 }
 
 export default function PageRoute({
     currentUser,
-    userLoading
 }: IPageRouteProps) {
     // 모든 라우트 정보를 조회합니다.
     const routes = useMemo<IRoutedPage[]>(() => {
         return PageList;
     }, [])
+    
+    console.log(currentUser);
 
     return (
         <Switch>
@@ -25,7 +25,6 @@ export default function PageRoute({
             <Route path={HomeInfo.path} exact component={Home} />
             <Route path={LoginInfo.path} component={Login} />
             <AuthRoute currentUser={currentUser} roles={["Admin", "Member"]}
-                       userLoading={userLoading}
                        path={TestPageInfo.path} component={TestPage}
             />
 

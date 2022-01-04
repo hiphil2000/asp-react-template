@@ -1,6 +1,6 @@
-﻿import UserStorage from "./UserStorage";
+﻿import StorageHelper from "./StorageHelper";
 
 export * from "./Interfaces";
 export {
-    UserStorage
+    StorageHelper
 }

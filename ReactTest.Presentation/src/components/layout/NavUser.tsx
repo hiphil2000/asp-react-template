@@ -1,4 +1,4 @@
-﻿import React, {useCallback} from "react";
+﻿import React, {useCallback, useState} from "react";
 import {IUser} from "../../libs/apis/Interfaces";
 import {Avatar, Button} from "@mui/material";
 import {LoginInfo} from "../../pages/auth";
@@ -17,12 +17,14 @@ export default function NavUser({
 }: INavUserProps) {
     const history = useHistory();
     const {state: open, toggle, setState: setOpen} = useToggle(false);
+    const [anchorEl, setAnchorEl] = useState<Element | undefined>(undefined);
     
     const gotoLogin = useCallback(() => {
         history.push(LoginInfo.path);
     }, [LoginInfo])
     
-    const handleAvatarClick = () => {
+    const handleAvatarClick = (e: React.MouseEvent) => {
+        setAnchorEl(e.target as Element);
         toggle();
     }
     
@@ -38,7 +40,9 @@ export default function NavUser({
                 <Button onClick={handleAvatarClick}>
                     <Avatar>{user.userName}</Avatar>
                 </Button>
-                <NavUserMenu open={open} onClose={handleMenuClose} onLogout={onLogout} />
+                <NavUserMenu anchorEl={anchorEl} open={open} 
+                             onClose={handleMenuClose} 
+                             onLogout={onLogout} />
             </> :
             <Button id={LoginInfo.pageId} key={LoginInfo.pageId}
                     onClick={gotoLogin}
